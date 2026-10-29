@@ -1,5 +1,12 @@
-*.csv
-*.txt
-*.py
-*.ipynb
-*.html
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+*.md
+*.zip
+*.7z
+_folder.html

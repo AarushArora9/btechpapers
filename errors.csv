@@ -1,0 +1,16 @@
+url,local_path,error
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2015\B.Tech,Requested branch not found.
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2016\B.Tech,Requested branch not found.
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2017\B.Tech,Requested branch not found.
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2018\B.Tech,Requested branch not found.
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2019\B.Tech,Requested branch not found.
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2015\B. Tech,Requested branch not found.
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2016\B. Tech,Requested branch not found.
+https://libportal.manipal.edu/MIT/Question%20Paper.aspx,MIT_Question_Papers\2021\Question Papers 2021\B.Tech,"TargetClosedError('Page.goto: Target page, context or browser has been closed')"
+https://libportal.manipal.edu/RootFolder/2022/Dec%202021-Jan%202022/B.Tech/VII%20Sem/Electrical%20and%20Communication/Object%20Oreinted%20Programming%20Using%20c++%20(ECE%204080)%20PART%20A.pdf,MIT_Question_Papers\2022\Dec 2021-Jan 2022\B.Tech\VII Sem\Electrical and Communication\Object Oreinted Programming Using c++ (ECE 4080) PART A.pdf,RuntimeError('HTTP 404')
+https://libportal.manipal.edu/RootFolder/2022/Dec%202021-Jan%202022/B.Tech/VII%20Sem/Electrical%20and%20Communication/Object%20Oreinted%20Programming%20Using%20c++%20(ECE%204080)%20PART%20B.pdf,MIT_Question_Papers\2022\Dec 2021-Jan 2022\B.Tech\VII Sem\Electrical and Communication\Object Oreinted Programming Using c++ (ECE 4080) PART B.pdf,RuntimeError('HTTP 404')
+https://libportal.manipal.edu/RootFolder/2022/Dec%202021-Jan%202022/B.Tech/VII%20Sem/ICE/Data%20Structues%20Using%20C++%20(ICE%204065)%20(Makeup)%20Part%20B.pdf,MIT_Question_Papers\2022\Dec 2021-Jan 2022\B.Tech\VII Sem\ICE\Data Structues Using C++ (ICE 4065) (Makeup) Part B.pdf,RuntimeError('HTTP 404')
+https://libportal.manipal.edu/RootFolder/2022/Dec%202021-Jan%202022/B.Tech/VII%20Sem/ICE/Data%20Structues%20Using%20C++%20(ICE%204065)%20Part%20B.pdf,MIT_Question_Papers\2022\Dec 2021-Jan 2022\B.Tech\VII Sem\ICE\Data Structues Using C++ (ICE 4065) Part B.pdf,RuntimeError('HTTP 404')
+https://libportal.manipal.edu/RootFolder/2023/Dec%202022%20-%20Jan%202023/B.Tech/VII%20Sem/ICE/Data%20Structure%20using%20C++%20(ICE%204065).pdf,MIT_Question_Papers\2023\Dec 2022 - Jan 2023\B.Tech\VII Sem\ICE\Data Structure using C++ (ICE 4065).pdf,RuntimeError('HTTP 404')
+https://libportal.manipal.edu/RootFolder/2023/Dec%202022%20-%20Jan%202023/B.Tech/VII%20Sem/ICE/Data%20Structures%20using%20C++%20(ICE%204065)(Makeup).pdf,MIT_Question_Papers\2023\Dec 2022 - Jan 2023\B.Tech\VII Sem\ICE\Data Structures using C++ (ICE 4065)(Makeup).pdf,RuntimeError('HTTP 404')
+https://libportal.manipal.edu/RootFolder/2024/Dec%202023-Jan%202024/B.Tech/VII%20Sem/ECE/Object%20Oriented%20Program%20Using%20C++%20(ECE-4080).pdf,MIT_Question_Papers\2024\Dec 2023-Jan 2024\B.Tech\VII Sem\ECE\Object Oriented Program Using C++ (ECE-4080).pdf,RuntimeError('HTTP 404')
