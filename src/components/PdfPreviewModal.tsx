@@ -78,7 +78,7 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
             </h4>
             <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
               {item.summary ||
-                'Official engineering and specification document generated and versioned in the OctoDoc documentation repository.'}
+                ' '}
             </p>
           </div>
 

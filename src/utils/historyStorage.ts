@@ -1,6 +1,6 @@
 import { DownloadHistoryItem, DownloadMetrics } from '../types';
 
-const STORAGE_KEY = 'octodoc_download_history_v1';
+const STORAGE_KEY = 'doc_download_history_v1';
 
 export function getDownloadHistory(): DownloadHistoryItem[] {
   if (typeof window === 'undefined') return [];

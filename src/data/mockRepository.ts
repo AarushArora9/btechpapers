@@ -6,7 +6,7 @@ import { generateValidPdfBytes } from '../utils/pdfGenerator';
  */
 export const REPOSITORY_DATA: DocItem = {
   id: 'root',
-  name: 'octodoc',
+  name: 'docs',
   type: 'folder',
   path: '/',
   lastCommit: 'chore: merge release v2.4.0 documentation and specs',
@@ -686,7 +686,7 @@ export const REPOSITORY_DATA: DocItem = {
       summary: 'Repository guide, directory index, download instructions, and contributing overview.',
       contentGenerator: () =>
         generateValidPdfBytes({
-          title: 'OctoDoc Repository Guide & Index',
+          title: 'Repository Guide & Index',
           category: 'Documentation',
           pageCount: 3,
           summary: 'Repository guide, directory index, download instructions, and contributing overview.',
