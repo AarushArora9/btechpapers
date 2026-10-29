@@ -9,7 +9,7 @@ interface BreadcrumbsProps {
 
 export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ currentPath, onNavigate }) => {
   // Parse path into segments
-  const segments: BreadcrumbSegment[] = [{ name: 'octodoc', path: '/' }];
+  const segments: BreadcrumbSegment[] = [{ name: 'root', path: '/' }];
 
   if (currentPath !== '/' && currentPath !== '') {
     const parts = currentPath.split('/').filter(Boolean);
