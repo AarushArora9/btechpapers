@@ -509,15 +509,7 @@ export default function App() {
 
           {/* Direct link to see the GitHub repository itself & download full code */}
           <div className="flex flex-wrap items-center gap-3 font-mono text-[11px]">
-            <a
-              href="/btechpapers-web-app.zip"
-              download="btechpapers-web-app.zip"
-              className="inline-flex items-center gap-1.5 rounded border border-neutral-300 bg-white px-2 py-0.5 text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700 transition-colors shadow-2xs"
-              title="Download entire code as ZIP to drop into your GitHub repo"
-            >
-              <Download className="h-3 w-3 text-blue-500" />
-              <span>Download Code (ZIP)</span>
-            </a>
+            
 
             <div className="flex items-center gap-1.5">
               <span className="text-neutral-400 dark:text-neutral-500">Repository:</span>
