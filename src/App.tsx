@@ -13,6 +13,7 @@ import {
   FileText,
   Download,
 } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 import { DocItem, DownloadHistoryItem, DownloadMetrics, FilterState, ThemeMode } from './types';
 import { fetchRepositoryTree } from './services/githubRepo';
 import { searchPapers } from './utils/fuzzySearch';
@@ -533,6 +534,9 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Vercel Analytics */}
+      <Analytics />
     </div>
   );
 }
