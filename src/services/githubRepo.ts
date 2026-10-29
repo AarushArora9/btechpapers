@@ -11,12 +11,52 @@ interface GitTreeItem {
   url?: string;
 }
 
-const CACHE_KEY = 'btechpapers_git_tree_cache_v2';
+// Version 3 cache key to immediately invalidate old caches containing source folders
+const CACHE_KEY = 'btechpapers_git_tree_cache_v3';
 const CACHE_TIME_KEY = 'btechpapers_git_tree_cache_time';
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache
 
+// Directories and files from web application source code that must NEVER appear in the document explorer
+const IGNORED_DIRECTORY_PREFIXES = [
+  'src/',
+  'src',
+  'public/',
+  'public',
+  'dist/',
+  'dist',
+  'build/',
+  'build',
+  'node_modules/',
+  'node_modules',
+  '.git',
+  '.github',
+  '.vercel',
+  '.next',
+];
+
+const IGNORED_ROOT_FILES = new Set([
+  'package.json',
+  'package-lock.json',
+  'yarn.lock',
+  'pnpm-lock.yaml',
+  'tsconfig.json',
+  'tsconfig.node.json',
+  'vite.config.ts',
+  'vite.config.js',
+  'vercel.json',
+  'index.html',
+  '.gitignore',
+  '.env',
+  '.env.example',
+  '.env.local',
+  'readme.md',
+  'deploy.md',
+  'metadata.json',
+]);
+
 /**
- * Builds a nested DocItem tree from flat git tree entries
+ * Builds a nested DocItem tree from flat git tree entries,
+ * strictly filtering out any website source code or non-academic files/folders.
  */
 export function buildHierarchyFromGitTree(items: Array<{ path: string; size?: number; type?: string }>): {
   root: DocItem;
@@ -40,7 +80,7 @@ export function buildHierarchyFromGitTree(items: Array<{ path: string; size?: nu
   const folderMap = new Map<string, DocItem>();
   folderMap.set('/', root);
 
-  // Helper to ensure a folder node exists
+  // Helper to ensure an academic folder node exists
   const getOrCreateFolder = (folderPath: string): DocItem => {
     const normalized = folderPath === '' || folderPath === '/' ? '/' : `/${folderPath.replace(/^\/+|\/+$/g, '')}`;
     if (folderMap.has(normalized)) {
@@ -73,19 +113,33 @@ export function buildHierarchyFromGitTree(items: Array<{ path: string; size?: nu
     return currentParent;
   };
 
-  // Process items
+  // Process items: ONLY process valid PDF documents
   for (const item of items) {
-    const rawPath = item.path;
-    // Skip git internal files
+    const rawPath = item.path.replace(/^\/+/, '');
+
+    // Skip dotfiles, hidden files, or git internals
     if (rawPath.startsWith('.') || rawPath.includes('/.')) continue;
+
+    // Skip all code, build, and node_modules paths
+    const isIgnoredDir = IGNORED_DIRECTORY_PREFIXES.some(
+      (prefix) => rawPath === prefix || rawPath.startsWith(`${prefix}/`) || rawPath.toLowerCase().startsWith(`${prefix.toLowerCase()}/`)
+    );
+    if (isIgnoredDir) continue;
 
     const segments = rawPath.split('/');
     const fileName = segments[segments.length - 1];
+
+    // Skip root-level config files (e.g. package.json, vercel.json, etc.)
+    if (IGNORED_ROOT_FILES.has(fileName.toLowerCase())) continue;
+
+    // Strict rule: ONLY accept .pdf question paper files!
+    // Non-PDF items (source code, tsx, css, json) and empty directory records are completely excluded.
     const isPdf = fileName.toLowerCase().endsWith('.pdf');
+    if (!isPdf) continue;
+
     const folderPath = segments.slice(0, -1).join('/');
 
-    // Track metadata tags
-    // First segment is typically Year (e.g. "2024", "2023")
+    // Track metadata tags: First segment is typically Year (e.g. "2024", "2023")
     if (segments.length > 0 && /^\d{4}$/.test(segments[0])) {
       yearsSet.add(segments[0]);
     }
@@ -106,57 +160,62 @@ export function buildHierarchyFromGitTree(items: Array<{ path: string; size?: nu
       sessionTag = segments[1];
     }
 
-    if (isPdf) {
-      const parentFolder = getOrCreateFolder(folderPath);
-      const fullPath = `/${rawPath.replace(/^\/+/, '')}`;
-      const rawCdnUrl = `https://raw.githubusercontent.com/${CONFIG.repositoryFullName}/${CONFIG.branch}/${encodeURI(rawPath)}`;
+    // Create the folder branch strictly because it contains this valid PDF
+    const parentFolder = getOrCreateFolder(folderPath);
+    const fullPath = `/${rawPath}`;
+    const rawCdnUrl = `https://raw.githubusercontent.com/${CONFIG.repositoryFullName}/${CONFIG.branch}/${encodeURI(rawPath)}`;
 
-      // Extract subject code if present (e.g. (MAT 1151), (ARC 14-107))
-      const codeMatch = fileName.match(/\(([A-Z]{2,4}[\s-]?\d{3,5}[A-Z]?)\)/i);
-      const subjectCode = codeMatch ? codeMatch[1].trim() : undefined;
+    // Extract subject code if present (e.g. (MAT 1151), (ARC 14-107))
+    const codeMatch = fileName.match(/\(([A-Z]{2,4}[\s-]?\d{3,5}[A-Z]?)\)/i);
+    const subjectCode = codeMatch ? codeMatch[1].trim() : undefined;
 
-      const fileItem: DocItem = {
-        id: `file-${rawPath}`,
-        name: fileName,
-        type: 'file',
-        path: fullPath,
-        size: item.size || 65000,
-        year: segments.length > 0 && /^\d{4}$/.test(segments[0]) ? segments[0] : undefined,
-        session: sessionTag,
-        semester: semesterTag,
-        subjectCode,
-        rawUrl: rawCdnUrl,
-        downloadUrl: rawCdnUrl,
-        category: semesterTag || 'Question Paper',
-        summary: `B.Tech University Examination Paper (${semesterTag || ''} - ${segments[0] || ''})`,
-        contentGenerator: async () => {
-          // Attempt to fetch real binary bytes directly from GitHub Raw CDN
-          try {
-            const resp = await fetch(rawCdnUrl, { mode: 'cors' });
-            if (resp.ok) {
-              const buf = await resp.arrayBuffer();
-              return new Uint8Array(buf);
-            }
-          } catch {
-            // Fall back to generated representation if network/CORS blocks
+    const fileItem: DocItem = {
+      id: `file-${rawPath}`,
+      name: fileName,
+      type: 'file',
+      path: fullPath,
+      size: item.size || 65000,
+      year: segments.length > 0 && /^\d{4}$/.test(segments[0]) ? segments[0] : undefined,
+      session: sessionTag,
+      semester: semesterTag,
+      subjectCode,
+      rawUrl: rawCdnUrl,
+      downloadUrl: rawCdnUrl,
+      category: semesterTag || 'Question Paper',
+      summary: `B.Tech University Examination Paper (${semesterTag || ''} - ${segments[0] || ''})`,
+      contentGenerator: async () => {
+        try {
+          const resp = await fetch(rawCdnUrl, { mode: 'cors' });
+          if (resp.ok) {
+            const buf = await resp.arrayBuffer();
+            return new Uint8Array(buf);
           }
-          return generateValidPdfBytes({
-            title: fileName.replace(/\.pdf$/i, ''),
-            category: semesterTag || 'B.Tech Paper',
-            summary: `Examination question paper for ${fileName.replace(/\.pdf$/i, '')}`,
-            pageCount: 3,
-          });
-        },
-      };
+        } catch {
+          // Fall back to generated representation if network/CORS blocks
+        }
+        return generateValidPdfBytes({
+          title: fileName.replace(/\.pdf$/i, ''),
+          category: semesterTag || 'B.Tech Paper',
+          summary: `Examination question paper for ${fileName.replace(/\.pdf$/i, '')}`,
+          pageCount: 3,
+        });
+      },
+    };
 
-      parentFolder.children = parentFolder.children || [];
-      parentFolder.children.push(fileItem);
-      allFiles.push(fileItem);
-    } else {
-      // It's a directory
-      getOrCreateFolder(rawPath);
-    }
+    parentFolder.children = parentFolder.children || [];
+    parentFolder.children.push(fileItem);
+    allFiles.push(fileItem);
   }
+
+  // Recursive pruning of any empty folders that contain no PDFs
+  const pruneEmptyFolders = (node: DocItem): boolean => {
+    if (node.type === 'file') return true;
+    if (!node.children || node.children.length === 0) return false;
+
+    node.children = node.children.filter((child) => pruneEmptyFolders(child));
+    return node.children.length > 0;
+  };
+  pruneEmptyFolders(root);
 
   // Sort children: folders first alphabetically, then files
   const sortNode = (node: DocItem) => {
