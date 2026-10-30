@@ -1,6 +1,0 @@
-{
-  "summary":  "Implementation plan for hosting the AarushArora9/btechpapers GitHub repository as a minimalist, aesthetic PDF downloader with live GitHub tree synchronization, Fuse.js fuzzy search, year and semester filters, direct GitHub Raw CDN downloads, client-side ZIP packaging, and universal deployment compatibility for GitHub Pages, Vercel, and Cloudflare Pages.",
-  "updatedAt":  "2026-10-29T14:26:47.650761179Z",
-  "requestFeedback":  true,
-  "userFacing":  true
-}
