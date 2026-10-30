@@ -10,4 +10,4 @@ coverage/
 *.zip
 *.7z
 _folder.html
-/aistudio/
+/.aistudio/
