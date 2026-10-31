@@ -165,7 +165,7 @@ export async function createAndDownloadZip(
 
   onProgress?.({
     percent: 5,
-    currentFileName: 'Starting parallel downloads...',
+    currentFileName: 'Starting downloads...',
     currentFileIndex: 0,
     totalFiles,
     state: 'preparing',
