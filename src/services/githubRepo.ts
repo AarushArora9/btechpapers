@@ -1,6 +1,7 @@
 import { CONFIG } from '../config';
 import { DocItem } from '../types';
 import { generateValidPdfBytes } from '../utils/pdfGenerator';
+import { getCachedPdfBytes, setCachedPdfBytes } from '../utils/zipper';
 
 interface GitTreeItem {
   path: string;
@@ -184,21 +185,28 @@ export function buildHierarchyFromGitTree(items: Array<{ path: string; size?: nu
       category: semesterTag || 'Question Paper',
       summary: `B.Tech University Examination Paper (${semesterTag || ''} - ${segments[0] || ''})`,
       contentGenerator: async () => {
+        const cached = getCachedPdfBytes(rawCdnUrl);
+        if (cached) return cached;
+
         try {
           const resp = await fetch(rawCdnUrl, { mode: 'cors' });
           if (resp.ok) {
             const buf = await resp.arrayBuffer();
-            return new Uint8Array(buf);
+            const bytes = new Uint8Array(buf);
+            setCachedPdfBytes(rawCdnUrl, bytes);
+            return bytes;
           }
         } catch {
           // Fall back to generated representation if network/CORS blocks
         }
-        return generateValidPdfBytes({
+        const generated = generateValidPdfBytes({
           title: fileName.replace(/\.pdf$/i, ''),
           category: semesterTag || 'B.Tech Paper',
           summary: `Examination question paper for ${fileName.replace(/\.pdf$/i, '')}`,
           pageCount: 3,
         });
+        setCachedPdfBytes(rawCdnUrl, generated);
+        return generated;
       },
     };
 
