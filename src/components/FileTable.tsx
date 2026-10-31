@@ -123,13 +123,13 @@ export const FileTable: React.FC<FileTableProps> = ({
           </label>
         </div>
 
-        <div className="flex items-center gap-6 text-[11px] font-mono">
+        <div className="flex items-center gap-3 sm:gap-6 text-[11px] font-mono">
           <span className="hidden md:inline text-neutral-400 dark:text-neutral-500">
             {displayItems.length} {displayItems.length === 1 ? 'item' : 'items'}
           </span>
           <span className="hidden sm:inline">Last commit</span>
-          <span className="w-16 text-right">Size</span>
-          <span className="w-16 text-right">Actions</span>
+          <span className="w-12 sm:w-16 text-right">Size</span>
+          <span className="w-8 sm:w-16 text-right">Actions</span>
         </div>
       </div>
 
@@ -186,16 +186,17 @@ export const FileTable: React.FC<FileTableProps> = ({
           return (
             <div
               key={item.id}
-              className={`group flex items-center justify-between px-4 py-2.5 text-xs transition-colors ${
+              className={`group flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 text-xs transition-colors ${
                 isSelected
                   ? 'bg-blue-50/50 dark:bg-blue-950/20'
                   : 'hover:bg-neutral-50/80 dark:hover:bg-neutral-800/40'
               }`}
             >
               {/* Left Zone: Checkbox & Name */}
-              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 mr-4">
+              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 mr-2 sm:mr-4">
                 {isFolder ? (
-                  <div className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 -my-2 p-2 shrink-0 opacity-0" aria-hidden="true">
+                  /* Hide empty checkbox spacer on mobile to give maximum room for the year name */
+                  <div className="hidden sm:flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 -my-2 p-2 shrink-0 opacity-0" aria-hidden="true">
                     <div className="h-5 w-5" />
                   </div>
                 ) : (
@@ -211,7 +212,7 @@ export const FileTable: React.FC<FileTableProps> = ({
                 )}
 
                 {/* Icon */}
-                <div className="shrink-0">
+                <div className="shrink-0 flex items-center justify-center">
                   {isFolder ? (
                     <Folder className="h-4 w-4 text-blue-500 fill-blue-500/20" />
                   ) : (
@@ -224,13 +225,17 @@ export const FileTable: React.FC<FileTableProps> = ({
                   {isFolder ? (
                     <button
                       onClick={() => onNavigateFolder(item.path)}
-                      className="flex items-center gap-2 text-left font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-400 transition-colors min-w-0 max-w-full focus-visible:outline-none"
+                      className="flex flex-col items-start justify-center text-left py-1 min-w-0 flex-1 max-w-full focus-visible:outline-none group/fbtn"
                     >
-                      <AutoScrollText title={item.name} className="flex-1">
+                      <AutoScrollText
+                        title={item.name}
+                        className="font-medium sm:font-semibold text-xs sm:text-sm text-neutral-900 group-hover/fbtn:text-blue-600 dark:text-neutral-100 dark:group-hover/fbtn:text-blue-400 transition-colors w-full"
+                      >
                         {item.name}
                       </AutoScrollText>
-                      <span className="shrink-0 text-[11px] text-neutral-400 dark:text-neutral-500 font-mono">
-                        ({countFolderFiles(item)} docs)
+                      {/* Number of docs shifted cleanly below the year/folder */}
+                      <span className="text-[10px] sm:text-[11px] text-neutral-400 dark:text-neutral-500 font-mono mt-0.5 leading-tight">
+                        {countFolderFiles(item)} {countFolderFiles(item) === 1 ? 'doc' : 'docs'}
                       </span>
                     </button>
                   ) : (
@@ -245,7 +250,7 @@ export const FileTable: React.FC<FileTableProps> = ({
                         </AutoScrollText>
                       </div>
                       {isSearching && (
-                        <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono truncate shrink-0 max-w-[180px]">
+                        <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono truncate shrink-0 max-w-[140px] sm:max-w-[180px]">
                           {item.path}
                         </span>
                       )}
@@ -264,12 +269,12 @@ export const FileTable: React.FC<FileTableProps> = ({
               </div>
 
               {/* Right Zone: Size */}
-              <div className="w-16 text-right shrink-0 font-mono text-[11px] text-neutral-600 dark:text-neutral-300 tabular-nums mr-2">
+              <div className="w-12 sm:w-16 text-right shrink-0 font-mono text-[10px] sm:text-[11px] text-neutral-600 dark:text-neutral-300 tabular-nums mr-1 sm:mr-2">
                 {isFolder ? formatBytes(calculateFolderBytes(item)) : formatBytes(item.size)}
               </div>
 
               {/* Right Zone: Action buttons */}
-              <div className="flex w-16 shrink-0 items-center justify-end gap-1">
+              <div className="flex w-8 sm:w-16 shrink-0 items-center justify-end gap-0.5 sm:gap-1">
                 {isFolder ? (
                   <button
                     onClick={() => onNavigateFolder(item.path)}

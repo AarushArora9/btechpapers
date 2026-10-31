@@ -339,7 +339,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 pb-20">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-2.5 sm:px-6 py-4 sm:py-6 pb-24">
         {/* Sleek Repository Header Strip (clean without description line) */}
         <div className="mb-6 rounded-lg border border-neutral-200 bg-white p-3.5 sm:p-4 dark:border-neutral-800 dark:bg-[#161b22] shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
