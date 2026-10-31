@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, memo } from 'react';
 
 interface AutoScrollTextProps {
   children: React.ReactNode;
@@ -8,13 +8,44 @@ interface AutoScrollTextProps {
   onClick?: () => void;
 }
 
+// Global shared ResizeObserver to avoid creating dozens of observers across rows
+type MeasureCallback = () => void;
+const observerCallbacks = new WeakMap<Element, MeasureCallback>();
+let sharedResizeObserver: ResizeObserver | null = null;
+let scheduledFrameId: number | null = null;
+const pendingElements = new Set<Element>();
+
+function getSharedResizeObserver(): ResizeObserver | null {
+  if (typeof window === 'undefined' || typeof ResizeObserver === 'undefined') return null;
+  if (!sharedResizeObserver) {
+    sharedResizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        pendingElements.add(entry.target);
+      }
+      // Batch all measurements in a single requestAnimationFrame to eliminate layout thrashing
+      if (scheduledFrameId === null) {
+        scheduledFrameId = window.requestAnimationFrame(() => {
+          scheduledFrameId = null;
+          pendingElements.forEach((target) => {
+            const cb = observerCallbacks.get(target);
+            if (cb) cb();
+          });
+          pendingElements.clear();
+        });
+      }
+    });
+  }
+  return sharedResizeObserver;
+}
+
 /**
- * AutoScrollText smoothly marquee-scrolls overflowing text in a continuous loop
- * while preserving all child elements (such as yellow search highlight <mark> tags).
- * Automatically measures container overflow using ResizeObserver.
- * Pauses automatically on hover or touch so users can read or click comfortably.
+ * High-performance AutoScrollText with zero input lag.
+ * - Uses a single batched ResizeObserver singleton across all rows.
+ * - Batches measurements in requestAnimationFrame to prevent forced reflows.
+ * - Hardware-accelerated CSS marquee with hover/touch pause.
+ * - Wrapped in React.memo to prevent unnecessary component re-renders.
  */
-export const AutoScrollText: React.FC<AutoScrollTextProps> = ({
+const AutoScrollTextComponent: React.FC<AutoScrollTextProps> = ({
   children,
   className = '',
   pixelsPerSecond = 32,
@@ -28,17 +59,17 @@ export const AutoScrollText: React.FC<AutoScrollTextProps> = ({
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    const measure = measureRef.current;
+    if (!container || !measure) return;
 
-    const checkOverflow = () => {
+    const measureLayout = () => {
       if (!containerRef.current || !measureRef.current) return;
       const containerWidth = containerRef.current.clientWidth;
       const contentWidth = measureRef.current.scrollWidth;
 
       if (contentWidth > containerWidth + 4) {
         setIsOverflowing(true);
-        // Calculate duration based on distance to keep smooth readable speed
-        const totalDistance = contentWidth + 32; // includes gap
+        const totalDistance = contentWidth + 32;
         const calculatedSeconds = Math.max(6, Math.min(30, totalDistance / pixelsPerSecond));
         setDuration(calculatedSeconds);
       } else {
@@ -46,19 +77,21 @@ export const AutoScrollText: React.FC<AutoScrollTextProps> = ({
       }
     };
 
-    checkOverflow();
+    // Initial measurement
+    measureLayout();
 
-    const resizeObserver = new ResizeObserver(() => {
-      checkOverflow();
-    });
-
-    resizeObserver.observe(container);
-    if (measureRef.current) {
-      resizeObserver.observe(measureRef.current);
+    const observer = getSharedResizeObserver();
+    if (observer) {
+      observerCallbacks.set(container, measureLayout);
+      observer.observe(container);
     }
 
     return () => {
-      resizeObserver.disconnect();
+      if (observer) {
+        observer.unobserve(container);
+        observerCallbacks.delete(container);
+        pendingElements.delete(container);
+      }
     };
   }, [children, pixelsPerSecond]);
 
@@ -68,16 +101,6 @@ export const AutoScrollText: React.FC<AutoScrollTextProps> = ({
       onClick={onClick}
       title={title}
       className={`relative max-w-full overflow-hidden select-text ${className}`}
-      style={
-        isOverflowing
-          ? {
-              maskImage:
-                'linear-gradient(to right, black 0%, black calc(100% - 20px), transparent 100%)',
-              WebkitMaskImage:
-                'linear-gradient(to right, black 0%, black calc(100% - 20px), transparent 100%)',
-            }
-          : undefined
-      }
     >
       {/* Hidden measure element to check true text width */}
       <span
@@ -89,14 +112,22 @@ export const AutoScrollText: React.FC<AutoScrollTextProps> = ({
       </span>
 
       {isOverflowing ? (
-        <div
-          className="animate-marquee-continuous"
-          style={{ animationDuration: `${duration}s` }}
-        >
-          <span className="inline-block pr-8 whitespace-nowrap">{children}</span>
-          <span className="inline-block pr-8 whitespace-nowrap" aria-hidden="true">
-            {children}
-          </span>
+        <div className="relative max-w-full overflow-hidden pr-3">
+          <div
+            className="animate-marquee-continuous"
+            style={{ animationDuration: `${duration}s` }}
+          >
+            <span className="inline-block pr-8 whitespace-nowrap">{children}</span>
+            <span className="inline-block pr-8 whitespace-nowrap" aria-hidden="true">
+              {children}
+            </span>
+          </div>
+
+          {/* Lightweight hardware-accelerated trailing fade edge (0 GPU overhead) */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-white dark:from-[#161b22] to-transparent"
+          />
         </div>
       ) : (
         <span className="truncate inline-block max-w-full whitespace-nowrap">
@@ -106,3 +137,5 @@ export const AutoScrollText: React.FC<AutoScrollTextProps> = ({
     </div>
   );
 };
+
+export const AutoScrollText = memo(AutoScrollTextComponent);

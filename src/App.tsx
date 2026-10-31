@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, useDeferredValue } from 'react';
 import {
   FolderGit2,
   GitBranch,
@@ -145,15 +145,18 @@ export default function App() {
     return findNodeByPath(rootNode, currentPath) || rootNode;
   }, [rootNode, currentPath, findNodeByPath]);
 
-  // Search & Filtering
-  const isFiltering = filterState.year !== 'all' || filterState.semester !== 'all';
-  const isSearching = searchQuery.trim().length > 0;
+  // Search & Filtering decoupled from typing input via useDeferredValue
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const deferredFilterState = useDeferredValue(filterState);
+
+  const isFiltering = deferredFilterState.year !== 'all' || deferredFilterState.semester !== 'all';
+  const isSearching = deferredSearchQuery.trim().length > 0;
   const isSearchOrFilterActive = isSearching || isFiltering;
 
   const searchResults = useMemo(() => {
     if (!isSearchOrFilterActive) return undefined;
-    return searchPapers(searchQuery, allFiles, filterState);
-  }, [isSearchOrFilterActive, searchQuery, allFiles, filterState]);
+    return searchPapers(deferredSearchQuery, allFiles, deferredFilterState);
+  }, [isSearchOrFilterActive, deferredSearchQuery, allFiles, deferredFilterState]);
 
   // Navigation handlers
   const handleNavigateFolder = useCallback((path: string) => {
@@ -168,8 +171,8 @@ export default function App() {
     handleNavigateFolder(parentPath);
   }, [currentPath, handleNavigateFolder]);
 
-  // Selection Logic (Capped at 30 files)
-  const handleToggleSelect = (item: DocItem) => {
+  // Selection Logic (Capped at 30 files) - memoized with useCallback
+  const handleToggleSelect = useCallback((item: DocItem) => {
     if (item.type !== 'file') return;
 
     setSelectedIds((prev) => {
@@ -184,10 +187,10 @@ export default function App() {
       }
       return next;
     });
-  };
+  }, []);
 
-  // Select all visible files
-  const handleSelectAllVisible = () => {
+  // Select all visible files - memoized
+  const handleSelectAllVisible = useCallback(() => {
     const visibleFiles = isSearchOrFilterActive && searchResults
       ? searchResults.map((r) => r.item)
       : (currentNode.children || []).filter((i) => i.type === 'file');
@@ -200,11 +203,11 @@ export default function App() {
       }
       return next;
     });
-  };
+  }, [isSearchOrFilterActive, searchResults, currentNode.children]);
 
-  const handleClearSelection = () => {
+  const handleClearSelection = useCallback(() => {
     setSelectedIds(new Set());
-  };
+  }, []);
 
   // Selected DocItem objects
   const selectedFiles = useMemo(() => {
@@ -216,8 +219,8 @@ export default function App() {
     return list;
   }, [selectedIds, allFilesMap]);
 
-  // Single PDF download (handles friendly error message)
-  const handleDownloadSingle = async (item: DocItem) => {
+  // Single PDF download (handles friendly error message) - memoized with useCallback
+  const handleDownloadSingle = useCallback(async (item: DocItem) => {
     try {
       await downloadSinglePdf(item, CONFIG.maxEgressBytes);
     } catch (err: unknown) {
@@ -227,7 +230,7 @@ export default function App() {
       setEgressError(msg);
       setTimeout(() => setEgressError(null), 5000);
     }
-  };
+  }, []);
 
   // Client-side ZIP Packaging (up to 30 files) with cancellation support
   const handleDownloadZip = async () => {
