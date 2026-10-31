@@ -2,6 +2,7 @@ import React from 'react';
 import { Archive, CheckCircle2, Loader2, X } from 'lucide-react';
 import { ZipProgressInfo } from '../utils/zipper';
 import { DownloadMetrics } from '../types';
+import { AutoScrollText } from './AutoScrollText';
 
 interface ZipProgressModalProps {
   isOpen: boolean;
@@ -75,13 +76,13 @@ export const ZipProgressModal: React.FC<ZipProgressModalProps> = ({
 
         {/* Progress Bar Container */}
         <div className="my-5">
-          <div className="flex justify-between items-center mb-1.5 text-xs font-mono">
-            <span className="text-neutral-600 dark:text-neutral-400 truncate max-w-[240px]">
+          <div className="flex justify-between items-center mb-1.5 text-xs font-mono gap-2">
+            <AutoScrollText className="text-neutral-600 dark:text-neutral-400 max-w-[280px]">
               {isCompleted
-                ? completedMetrics?.archiveName
+                ? completedMetrics?.archiveName || 'Archive generated'
                 : progress?.currentFileName || 'Starting...'}
-            </span>
-            <span className="font-bold text-neutral-900 dark:text-neutral-100 tabular-nums">
+            </AutoScrollText>
+            <span className="font-bold text-neutral-900 dark:text-neutral-100 tabular-nums shrink-0">
               {percent}%
             </span>
           </div>

@@ -11,6 +11,7 @@ import {
   GraduationCap,
   Calendar,
 } from 'lucide-react';
+import { AutoScrollText } from './AutoScrollText';
 
 interface DownloadReviewModalProps {
   isOpen: boolean;
@@ -137,9 +138,12 @@ export const DownloadReviewModal: React.FC<DownloadReviewModalProps> = ({
 
                   {/* Name and Tags */}
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm text-neutral-900 dark:text-neutral-100 truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <AutoScrollText
+                      title={file.name}
+                      className="font-medium text-sm text-neutral-900 dark:text-neutral-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                    >
                       {file.name}
-                    </p>
+                    </AutoScrollText>
                     <div className="flex flex-wrap items-center gap-2 mt-0.5 text-[11px] text-neutral-500 dark:text-neutral-400 font-mono">
                       {file.semester && (
                         <span className="flex items-center gap-1">
