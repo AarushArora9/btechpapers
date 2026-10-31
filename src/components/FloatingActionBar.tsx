@@ -54,18 +54,18 @@ export const FloatingActionBar: React.FC<FloatingActionBarProps> = ({
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
           <button
             onClick={onClear}
-            className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white transition-colors"
+            className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-neutral-300 hover:bg-neutral-800 hover:text-white transition-colors min-h-[42px] sm:min-h-[38px]"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
             <span>Clear</span>
           </button>
 
           <button
             onClick={onDownloadZip}
-            className="flex flex-1 sm:flex-initial items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+            className="flex flex-1 sm:flex-initial items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-blue-500 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 min-h-[44px] active:scale-[0.98]"
           >
-            <Archive className="h-3.5 w-3.5" />
-            <span>Download ZIP ({count})</span>
+            <Archive className="h-4 w-4" />
+            <span>Review & Download ({count})</span>
           </button>
         </div>
       </div>

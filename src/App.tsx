@@ -11,7 +11,6 @@ import {
   Loader2,
   AlertCircle,
   FileText,
-  Download,
 } from 'lucide-react';
 import { Analytics } from '@vercel/analytics/react';
 import { DocItem, DownloadHistoryItem, DownloadMetrics, FilterState, ThemeMode } from './types';
@@ -27,6 +26,7 @@ import { SearchBar } from './components/SearchBar';
 import { FilterChips } from './components/FilterChips';
 import { FileTable } from './components/FileTable';
 import { FloatingActionBar } from './components/FloatingActionBar';
+import { DownloadReviewModal } from './components/DownloadReviewModal';
 import { ZipProgressModal } from './components/ZipProgressModal';
 import { HistoryDrawer } from './components/HistoryDrawer';
 import { PdfPreviewModal } from './components/PdfPreviewModal';
@@ -73,6 +73,7 @@ export default function App() {
   const [egressError, setEgressError] = useState<string | null>(null);
 
   // ZIP progress state and abort controller ref
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState<boolean>(false);
   const [isZipModalOpen, setIsZipModalOpen] = useState<boolean>(false);
   const [zipProgress, setZipProgress] = useState<ZipProgressInfo | null>(null);
   const [completedMetrics, setCompletedMetrics] = useState<DownloadMetrics | null>(null);
@@ -465,7 +466,21 @@ export default function App() {
       <FloatingActionBar
         selectedFiles={selectedFiles}
         onClear={handleClearSelection}
-        onDownloadZip={handleDownloadZip}
+        onDownloadZip={() => setIsReviewModalOpen(true)}
+        maxLimit={CONFIG.maxBatchSelect}
+      />
+
+      {/* Final Check / Review Selected Papers Modal */}
+      <DownloadReviewModal
+        isOpen={isReviewModalOpen}
+        selectedFiles={selectedFiles}
+        onToggleSelect={handleToggleSelect}
+        onClearSelection={handleClearSelection}
+        onConfirmDownload={() => {
+          setIsReviewModalOpen(false);
+          handleDownloadZip();
+        }}
+        onClose={() => setIsReviewModalOpen(false)}
         maxLimit={CONFIG.maxBatchSelect}
       />
 
@@ -507,22 +522,18 @@ export default function App() {
             <span>PDF Question Papers Explorer</span>
           </div>
 
-          {/* Direct link to see the GitHub repository itself & download full code */}
-          <div className="flex flex-wrap items-center gap-3 font-mono text-[11px]">
-            
-
-            <div className="flex items-center gap-1.5">
-              <span className="text-neutral-400 dark:text-neutral-500">Repository:</span>
-              <a
-                href={CONFIG.repositoryUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 rounded border border-neutral-200 bg-neutral-100 px-2 py-0.5 text-neutral-800 hover:bg-neutral-200 hover:text-blue-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-blue-400 transition-colors"
-              >
-                <span>{CONFIG.repositoryFullName}</span>
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
+          {/* Direct link to see the GitHub repository itself */}
+          <div className="flex items-center gap-1.5 font-mono text-[11px]">
+            <span className="text-neutral-400 dark:text-neutral-500">Repository:</span>
+            <a
+              href={CONFIG.repositoryUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded border border-neutral-200 bg-neutral-100 px-2 py-0.5 text-neutral-800 hover:bg-neutral-200 hover:text-blue-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-blue-400 transition-colors"
+            >
+              <span>{CONFIG.repositoryFullName}</span>
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
         </div>
       </footer>

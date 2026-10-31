@@ -40,3 +40,33 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(140, 140, 140, 0.45);
 }
+
+/* Horizontal continuous scrolling marquee for truncated text */
+@keyframes horizontal-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-continuous {
+  display: inline-flex;
+  width: max-content;
+  will-change: transform;
+  animation-name: horizontal-marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.animate-marquee-continuous:hover,
+.animate-marquee-continuous:active {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-continuous {
+    animation: none !important;
+  }
+}

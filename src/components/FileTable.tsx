@@ -11,6 +11,7 @@ import {
 import { DocItem } from '../types';
 import { formatBytes, countFolderFiles, calculateFolderBytes } from '../data/mockRepository';
 import { SearchResult } from '../utils/fuzzySearch';
+import { AutoScrollText } from './AutoScrollText';
 
 interface FileTableProps {
   currentPath: string;
@@ -99,7 +100,7 @@ export const FileTable: React.FC<FileTableProps> = ({
       {/* Table Header mimicking GitHub Repository Table Header */}
       <div className="flex items-center justify-between border-b border-neutral-200 bg-neutral-50/70 px-4 py-2.5 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
+          <label className="flex items-center gap-3 cursor-pointer select-none min-h-[40px] sm:min-h-[36px] py-0.5">
             <input
               type="checkbox"
               checked={allVisibleSelected}
@@ -113,7 +114,7 @@ export const FileTable: React.FC<FileTableProps> = ({
                   onSelectAllVisible();
                 }
               }}
-              className="h-3.5 w-3.5 rounded border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800"
+              className="h-5 w-5 rounded-md border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 cursor-pointer transition-transform active:scale-95"
               title={allVisibleSelected ? 'Deselect visible' : `Select all visible (up to ${maxLimit})`}
             />
             <span className="font-medium text-neutral-800 dark:text-neutral-200">
@@ -192,17 +193,21 @@ export const FileTable: React.FC<FileTableProps> = ({
               }`}
             >
               {/* Left Zone: Checkbox & Name */}
-              <div className="flex min-w-0 flex-1 items-center gap-3 mr-4">
+              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 mr-4">
                 {isFolder ? (
-                  <div className="h-3.5 w-3.5 shrink-0 opacity-20" aria-hidden="true" />
+                  <div className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 -my-2 p-2 shrink-0 opacity-0" aria-hidden="true">
+                    <div className="h-5 w-5" />
+                  </div>
                 ) : (
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => onToggleSelect(item)}
-                    className="h-3.5 w-3.5 rounded border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800 cursor-pointer"
-                    aria-label={`Select ${item.name}`}
-                  />
+                  <div className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 -my-2 p-2 shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => onToggleSelect(item)}
+                      className="h-5 w-5 rounded-md border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 cursor-pointer transition-transform active:scale-95"
+                      aria-label={`Select ${item.name}`}
+                    />
+                  </div>
                 )}
 
                 {/* Icon */}
@@ -219,24 +224,28 @@ export const FileTable: React.FC<FileTableProps> = ({
                   {isFolder ? (
                     <button
                       onClick={() => onNavigateFolder(item.path)}
-                      className="flex items-center gap-2 text-left font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-400 transition-colors truncate focus-visible:outline-none"
+                      className="flex items-center gap-2 text-left font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-400 transition-colors min-w-0 max-w-full focus-visible:outline-none"
                     >
-                      <span className="truncate">{item.name}</span>
+                      <AutoScrollText title={item.name} className="flex-1">
+                        {item.name}
+                      </AutoScrollText>
                       <span className="shrink-0 text-[11px] text-neutral-400 dark:text-neutral-500 font-mono">
                         ({countFolderFiles(item)} docs)
                       </span>
                     </button>
                   ) : (
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 truncate">
-                      <span
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 min-w-0 flex-1">
+                      <div
                         onClick={() => onPreviewFile(item)}
-                        className="cursor-pointer font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-400 truncate transition-colors"
+                        className="cursor-pointer font-medium text-neutral-900 hover:text-blue-600 dark:text-neutral-100 dark:hover:text-blue-400 transition-colors min-w-0 max-w-full flex-1"
                         title={item.name}
                       >
-                        {renderHighlightedName(item.name, item)}
-                      </span>
+                        <AutoScrollText title={item.name}>
+                          {renderHighlightedName(item.name, item)}
+                        </AutoScrollText>
+                      </div>
                       {isSearching && (
-                        <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono truncate">
+                        <span className="text-[10px] text-neutral-400 dark:text-neutral-500 font-mono truncate shrink-0 max-w-[180px]">
                           {item.path}
                         </span>
                       )}

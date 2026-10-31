@@ -78,7 +78,7 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
             </h4>
             <p className="text-neutral-600 dark:text-neutral-400 leading-relaxed">
               {item.summary ||
-                ' '}
+                'Official examination question paper for B.Tech engineering coursework.'}
             </p>
           </div>
 
@@ -101,12 +101,12 @@ export const PdfPreviewModal: React.FC<PdfPreviewModalProps> = ({
 
         {/* Footer Actions */}
         <div className="mt-6 flex items-center justify-between pt-4 border-t border-neutral-100 dark:border-neutral-800">
-          <label className="flex items-center gap-2 text-xs font-medium text-neutral-700 dark:text-neutral-300 cursor-pointer">
+          <label className="flex items-center gap-2.5 text-xs font-medium text-neutral-700 dark:text-neutral-300 cursor-pointer min-h-[44px] py-1 select-none">
             <input
               type="checkbox"
               checked={isSelected}
               onChange={() => onToggleSelect(item)}
-              className="h-3.5 w-3.5 rounded border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-700 dark:bg-neutral-800"
+              className="h-5 w-5 rounded-md border-neutral-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-800 cursor-pointer transition-transform active:scale-95"
             />
             <span>Include in ZIP batch</span>
           </label>
